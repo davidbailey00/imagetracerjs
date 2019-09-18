@@ -1117,6 +1117,14 @@ function ImageTracer(){
 
 	// Helper function: loading an image from a URL, then executing callback with canvas as argument
 	this.loadImage = function(url,callback,options){
+		if (typeof window !== 'undefined') {
+			_this.loadImageBrowser(url,callback,options);
+		} else {
+			_this.loadImageNode(url,callback,options);
+		}
+	},
+
+	this.loadImageBrowser = function(url,callback,options) {
 		var img = new Image();
 		if(options && options.corsenabled){ img.crossOrigin = 'Anonymous'; }
 		img.onload = function(){
@@ -1128,6 +1136,23 @@ function ImageTracer(){
 			callback(canvas);
 		};
 		img.src = url;
+	},
+
+	this.loadImageNode = function(url,callback) {
+		var Canvas = require('canvas');
+		var sizeOf = require('image-size');
+
+		sizeOf(url, function(err, dimensions) {
+			if (err) throw err;
+
+			var canvas = Canvas.createCanvas(dimensions.width, dimensions.height);
+			var context = canvas.getContext('2d');
+
+			Canvas.loadImage(url).then(function(img) {
+				context.drawImage(img,0,0);
+				callback(canvas);
+			});
+		});
 	},
 
 	// Helper function: getting ImageData from a canvas
