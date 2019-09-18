@@ -1117,10 +1117,11 @@ function ImageTracer(){
 
 	// Helper function: loading an image from a URL, then executing callback with canvas as argument
 	this.loadImage = function(url,callback,options){
-		if (typeof window !== 'undefined') {
-			_this.loadImageBrowser(url,callback,options);
-		} else {
+		// TODO: document options.node
+		if (options.node === true) {
 			_this.loadImageNode(url,callback,options);
+		} else {
+			_this.loadImageBrowser(url,callback,options);
 		}
 	},
 
@@ -1143,7 +1144,10 @@ function ImageTracer(){
 		var sizeOf = require('image-size');
 
 		sizeOf(url, function(err, dimensions) {
-			if (err) throw err;
+			if (err) {
+				callback(null, err);
+				return;
+			}
 
 			var canvas = Canvas.createCanvas(dimensions.width, dimensions.height);
 			var context = canvas.getContext('2d');
@@ -1151,6 +1155,8 @@ function ImageTracer(){
 			Canvas.loadImage(url).then(function(img) {
 				context.drawImage(img,0,0);
 				callback(canvas);
+			}).catch(function(err) {
+				callback(null, err);
 			});
 		});
 	},
