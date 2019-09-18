@@ -6,11 +6,12 @@
     "rules": {
         "indent": [
             2,
-            "tab"
+            "tab",
+            { "outerIIFEBody": 0 }
         ],
         "linebreak-style": [
             2,
-            "windows"
+            "unix"
         ],
         "quotes": [
             2,
